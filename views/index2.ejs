@@ -1,0 +1,49 @@
+<h1>Collab Drive</h1>
+<form method="post" action="/newItem">
+    <input type="text" name="name">
+    <input type="hidden" name="fpath" value="<%= user.googlename %>">
+    <input type="hidden" name="fowner" value="<%= user.googleemail %>">
+    <input type="hidden" name="type" value="file">
+    <input type="submit" value="add new file"><br>
+</form>
+
+<form method="post" action="/newItem">
+    <input type="text" name="name">
+    <input type="hidden" name="fpath" value="<%= user.googlename %>">
+    <input type="hidden" name="fowner" value="<%= user.googleemail %>">
+    <input type="hidden" name="type" value="folder">
+    <input type="submit" value="add new folder"><br>
+</form>
+<hr>
+<table class="table table-bordered table-striped" style="background:white">
+    <thead>
+        <tr><th>Name</th><th>Shared</th><th>CreatedAt</th></tr>
+    </thead>
+    <tbody>
+    <% files.forEach(f=> { %>
+      <tr> 
+        <td>
+            <a href="/file/<%= f['_id'] %>"> 
+                <img src="/images/file.png" width="24" height="24" />
+                <span><%= f.name %></span>
+            </a>
+        </td>
+        <td><%= f.shared %></td>
+        <td><%= f.createdAt %></td>
+      </tr>
+    <% }) %>
+    <% folders.forEach(f=> { %>
+        <tr> 
+          <td>
+              <a href=""> 
+                  <img src="/images/folder.png" width="24" height="24" />
+                  <span><%= f.name %></span>
+              </a>
+          </td>
+          <td><%= f.shared %></td>
+          <td><%= f.fcreatedAt %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+</table>
+

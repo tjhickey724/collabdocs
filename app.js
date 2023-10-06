@@ -28,7 +28,8 @@ const usersRouter = require('./routes/users');
 const toDoRouter = require('./routes/todo');
 const toDoAjaxRouter = require('./routes/todoAjax');
 
-
+const Folder =require('./models/Folder')
+const File=require('./models/File')
 
 const app = express();
 
@@ -50,81 +51,147 @@ app.use(loggingRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-app.use('/todo',toDoRouter);
-app.use('/todoAjax',toDoAjaxRouter);
-
-app.get('/profiles',
-    isLoggedIn,
-    async (req,res,next) => {
-      try {
-        res.locals.profiles = await User.find({})
-        res.render('profiles')
-      }
-      catch(e){
-        next(e)
-      }
-    }
-  )
-
-app.use('/publicprofile/:userId',
-    async (req,res,next) => {
-      try {
-        let userId = req.params.userId
-        res.locals.profile = await User.findOne({_id:userId})
-        res.render('publicprofile')
-      }
-      catch(e){
-        console.log("Error in /profile/userId:")
-        next(e)
-      }
-    }
-)
+//app.use('/todo',toDoRouter);
+//app.use('/todoAjax',toDoAjaxRouter);
 
 
-app.get('/profile',
-    isLoggedIn,
-    (req,res) => {
-      res.render('profile')
-    })
+app.get("/file/:id", isLoggedIn, async(req, res, next) =>{
+  // i need to check if he is the owner or shared with to view 
+     var id=req.params.id
+      console.log("IDDD is" + id)
+     const file=await File.findById(id);
+     console.log("file content")
+     console.log(file)
+     res.locals.file = file;
+     res.render('filecontent2');//, { title: 'Express', path:file.path,filename:file.name,id:file._id, user: req.user,file:file,text:file.text});
+  
+});
+// app.get('/profiles',
+//     isLoggedIn,
+//     async (req,res,next) => {
+//       try {
+//         res.locals.profiles = await User.find({})
+//         res.render('profiles')
+//       }
+//       catch(e){
+//         next(e)
+//       }
+//     }
+//   )
 
-app.get('/editProfile',
-    isLoggedIn,
-    (req,res) => res.render('editProfile'))
-
-app.post('/editProfile',
-    isLoggedIn,
-    async (req,res,next) => {
-      try {
-        let username = req.body.username
-        let age = req.body.age
-        req.user.username = username
-        req.user.age = age
-        req.user.imageURL = req.body.imageURL
-        await req.user.save()
-        res.redirect('/profile')
-      } catch (error) {
-        next(error)
-      }
-
-    })
+// app.use('/publicprofile/:userId',
+//     async (req,res,next) => {
+//       try {
+//         let userId = req.params.userId
+//         res.locals.profile = await User.findOne({_id:userId})
+//         res.render('publicprofile')
+//       }
+//       catch(e){
+//         console.log("Error in /profile/userId:")
+//         next(e)
+//       }
+//     }
+// )
 
 
-app.use('/data',(req,res) => {
-  res.json([{a:1,b:2},{a:5,b:3}]);
-})
+// app.get('/profile',
+//     isLoggedIn,
+//     (req,res) => {
+//       res.render('profile')
+//     })
+
+// app.get('/editProfile',
+//     isLoggedIn,
+//     (req,res) => res.render('editProfile'))
+
+
+// app.post('/editProfile',
+//     isLoggedIn,
+//     async (req,res,next) => {
+//       try {
+//         let username = req.body.username
+//         let age = req.body.age
+//         req.user.username = username
+//         req.user.age = age
+//         req.user.imageURL = req.body.imageURL
+//         await req.user.save()
+//         res.redirect('/profile')
+//       } catch (error) {
+//         next(error)
+//       }
+
+//     })
+
+
+// app.use('/data',(req,res) => {
+//   res.json([{a:1,b:2},{a:5,b:3}]);
+// })
 
 const User = require('./models/User');
 
-app.get("/test",async (req,res,next) => {
-  try{
-    const u = await User.find({})
-    console.log("found u "+u)
-  }catch(e){
-    next(e)
-  }
+// app.get("/test",async (req,res,next) => {
+//   try{
+//     const u = await User.find({})
+//     console.log("found u "+u)
+//   }catch(e){
+//     next(e)
+//   }
 
-})
+// })
 
+app.post("/newItem", isLoggedIn,
+  async (req, res, next) => {
+    console.log("Hello people");
+        console.log(req.body.type);
+        console.log(req.body.fowner);
+        console.log(req.body.fpath)
+
+    console.log(req.body.type=="folder");
+    if(req.body.type=="folder"){
+      const folder = new Folder(
+        {name:req.body.name,
+         fcreatedAt: new Date(),
+         fowner: req.body.fowner,
+         fpath: req.body.fpath,
+         shared:"No"
+        });
+      await folder.save();
+    }
+    else if(req.body.type=="file"){
+
+      const file = new File(
+        {name:req.body.name,
+         createdAt: new Date(),
+         owner: req.body.fowner,
+         path: req.body.fpath,
+         shared:"No",
+         privilage:"edit"
+        });
+      await file.save();
+    }
+
+    res.redirect('/');
+    
+                });
+
+     
+app.post("/savefile",
+  isLoggedIn,
+  async (req, res, next) => {
+    // console.log(" I m saving now")
+    console.log("inside savefile:")
+    console.log(JSON.stringify(req.body));
+    var file=await File.findById(req.body.id);
+    file.text=req.body.text
+    file.lastmodified=new Date();
+    await file.save();
+    console.log(JSON.stringify(file));
+    res.redirect("/file/"+req.body.id);
+
+        // console.log(" done saving now")
+
+
+} );  
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

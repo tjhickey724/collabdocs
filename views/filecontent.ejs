@@ -1,0 +1,43 @@
+
+  <script type="text/javascript">
+
+  	var host="https://"+window.location.hostname+"/";
+  	var host2=window.location.origin+"/"
+  	$(window).on('beforeunload', function() {
+         
+         $.post( host2 +"savefile",{'id':$('#id').val(), 'text':$("#content").val()},function(data) {
+        
+                     
+                      });
+        });
+        window.onunload = function() { 
+        	
+          $.post(host2+"savefile",{'id':$('#id').val(), 'text':$("#content").val()},function(data) {
+      
+                     
+                      });
+        }
+        function save (){
+        	 $.post(host2+"savefile",{'id':$('#id').val(), 'text':$("#content").val()},function(data) {
+      
+                     
+                      });
+        }
+
+        $(window).load(function () {
+            $("#content").val($('#text').val())
+
+
+        });
+  </script>
+
+
+ <center> <h2><%= filename %> file</h2></center>
+<input id="save" type="button" value="Save" onclick="save();" />
+<input id="share" type="button" value="share" onclick="share();" />
+
+  <textarea id="content"; text="<%=text%>" style="width:100%; height:100vh;"></textarea>
+ <input type="hidden" value= "<%=id%>"id="id">
+ <input type="hidden" value= "<%=file%>"id="path">
+  <input type="hidden" value= "<%=text%>"id="text">
+

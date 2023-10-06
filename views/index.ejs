@@ -1,14 +1,96 @@
 
 
+  <script type="text/javascript">
+
+
+      $(document).ready(function(){ 
+        var folders= <%-JSON.stringify(folders)%>;
+        var files= <%-JSON.stringify(files)%>;
+
+       var path=$("#path").val();
+      var table = $('<table id =table1></table>').addClass("table-bordered table");
+      var row = $('<tr></tr>')
+      row.append($('<th></th>').text("Name"));
+      row.append($('<th></th>').text("Shared"));
+      row.append($('<th></th>').text("Created at"));
+      table.append(row)
+
+
+      for (f in folders){
+      if (folders[f].fpath==path){
+              row = $('<tr></tr>')
+      var cell= $('<td><a href=""> <img src="/images/folder.png" width="24" height="24" /><span>'+folders[f].name+'</span></a></td>');
+      row.append( cell);
+      row.append( $('<td></td>').text(folders[f].shared));
+      row.append( $('<td></td>').text(folders[f].fcreatedAt));
+        table.append(row);}}
+      for ( var fi in files){
+        if(files[fi].path==path){
+           row = $('<tr></tr>')
+            var href="/file/"+files[fi]._id
+             var cell= $('<td><a href="'+href+'"> <img src="/images/file.png" width="24" height="24" /><span>'+files[fi].name+'</span></a></td>');
+      row.append( cell);
+      row.append( $('<td></td>').text(files[fi].shared));
+      row.append( $('<td></td>').text(files[fi].createdAt));
+        table.append(row);}}
+      $("#pathd").append(table)
+
+});
+
+function newName(type, user) {
+name = prompt("Please enter the " +type+" name", "new " + type);
+if (name!== 'null'){
+  if (name.trim().length ==0)
+ name="new " + type
+ owner=$("#owner").val();
+  path=$("#path").val();
+
+ 
+$.post("/newItem",
+         {
+            name: name,
+            fowner: owner,
+            fpath:path,
+            type:type,
+         },
+         function (data, status) {
+
+            console.log(data);
+
+         });
+             location.reload();
+
+}
+}
+
+
+</script>
   <div class="jumbotron">
-    <h1> Authentication Demo </h1>
-    <p>Welcome to the Authentication Demo </p>
-    <ul>
+     <ul>
       <% if (loggedIn) {%>
-      <li><a href="/profile">See your profile </a></li>
+          <div class="dropdown">
+          <button class="dropbtn">add new</button>
+          <div class="dropdown-content">
+            <a href="javascript:newName('folder')">New Folder </a>
+            <a href="javascript:newName('file')">New File </a>
+
+            <input type="hidden" value= "<%=user.googleemail%>"id="owner">
+            <input type="hidden" value= "<%=user.googlename%>"id="path">
+             <input type="hidden" value= "<%=folders%>"id="folders">
+              <input type="hidden" value= "<%=files%>"id="files">
+          </div>
+
+
+        </div>
+         <h1> Collab Drive </h1>
+   
+         <div id='pathd'style="background:white;">
+           </div>
+     <!--  <li><a href="/profile">See your profile </a></li>
       <li><a href="/profiles">See everyone's profile</a></li>
       <li><a href="/todo">See your to do list </a></li>
-      <li><a href="/todoAjax">See your to do list with Ajax </a></li>
+      <li><a href="/todoAjax">See your to do list with Ajax </a></li> -->
       <% } %>
     </ul>
+   
   </div>
