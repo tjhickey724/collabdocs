@@ -30,7 +30,7 @@ const toDoAjaxRouter = require('./routes/todoAjax');
 
 const Folder =require('./models/Folder')
 const File=require('./models/File')
-
+const Privilage=require('./models/Privilege')
 const app = express();
 
 // view engine setup
@@ -62,7 +62,10 @@ app.get("/file/:id", isLoggedIn, async(req, res, next) =>{
      const file=await File.findById(id);
      console.log("file content")
      console.log(file)
+     var folder=file.path.split('/')[(file.path.split('/').length-1)];
      res.locals.file = file;
+     res.locals.parent=file.parent;
+     res.locals.folder=folder;
      res.render('filecontent2');//, { title: 'Express', path:file.path,filename:file.name,id:file._id, user: req.user,file:file,text:file.text});
   
 });
@@ -139,6 +142,21 @@ const User = require('./models/User');
 
 // })
 
+app.post("/share", isLoggedIn,
+  async (req, res, next) => {
+   var file=await File.findById(req.body.id);
+   if (req.body.email.trim().length>0 && file.owner==req.user.googleemail)
+    file.shared="Yes"
+    await file.save();
+    const privilage= new Privilage ({fileId:req.body.id, sharedwith:req.body.email, privilegetype:req.body.privilege})
+    await privilage.save();
+     res.redirect("/file/"+req.body.id);
+   });
+
+app.get('/shared', isLoggedIn, async(req, res, next) =>{
+  const sharedfiles= await  Privilage.find( {sharedwith:req.user.googleemail})
+  res.render('shared',{files:sharedfiles} );
+});
 app.post("/newItem", isLoggedIn,
   async (req, res, next) => {
     console.log("Hello people");
@@ -153,6 +171,7 @@ app.post("/newItem", isLoggedIn,
          fcreatedAt: new Date(),
          fowner: req.body.fowner,
          fpath: req.body.fpath,
+         parent:req.body.parent,
          shared:"No"
         });
       await folder.save();
@@ -164,13 +183,15 @@ app.post("/newItem", isLoggedIn,
          createdAt: new Date(),
          owner: req.body.fowner,
          path: req.body.fpath,
+         parent:req.body.parent,
          shared:"No",
          privilage:"edit"
         });
       await file.save();
     }
-
+    if(req.body.parent==".")
     res.redirect('/');
+  else res.redirect('/folders/'+req.body.parent)
     
                 });
 

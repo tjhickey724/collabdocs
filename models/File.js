@@ -12,6 +12,7 @@ var FileSchema = Schema( {
   privilage:String,
   createdAt:Date,
   text: String,
+  parent:String,
   lastmodified:Date
 } );
 

@@ -10,6 +10,7 @@ var FolderSchema = Schema( {
   fowner:String,
   shared:String,
   fcreatedAt:Date,
+  parent:String,
 } );
 
 module.exports = mongoose.model( 'Folder', FolderSchema );

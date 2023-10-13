@@ -1,0 +1,24 @@
+
+<h1>Collab Drive</h1>
+
+<table class="table table-bordered table-striped" style="background:white">
+    <thead>
+        <tr><th>Name</th><th>priviliage</th></tr>
+    </thead>
+    <tbody>
+    <% files.forEach(f=> { %>
+      <tr> 
+        <td>
+            <a href="/file/<%= f.fileId %>"> 
+                <img src="/images/file.png" width="24" height="24" />
+                <span><%= f.name %></span>
+            </a>
+        </td>
+        <td><%= f.privilegetype %></td>
+        <td><%= f.createdAt %></td>
+      </tr>
+    <% }) %>
+   
+    </tbody>
+</table>
+

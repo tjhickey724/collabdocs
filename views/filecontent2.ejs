@@ -1,5 +1,27 @@
 
- <center> <h2><%= file.name %> file</h2></center>
+ <%if(parent!="."){ %>
+
+ <a href="/folders/<%= parent %>">
+				<span class="button"> <%=folder%></span>
+  </a>
+ <% } else  { %>
+<a href="/">
+        <span class="button"> <%=folder%></span>
+      </a>
+ <% } %>
+ <center> <h2><%= file.path %> /<%= file.name %> file</h2></center>
+ <form method="post" action="/share">
+    <input type="hidden" name="id" value="<%= file['_id'] %>">
+    <input type="text" name="email">
+    <label for="privilege">Choose a privilege:</label>
+    <select id="privilege" name="privilege">
+  <option value="viewer">Viewer</option>
+  <option value="editor">Editor</option>
+  
+</select>
+
+    <input type="submit" value="share"><br>
+</form>
  <form method="post" action="/savefile">
     <input type="hidden" name="id" value="<%= file['_id'] %>">
     <input type="submit" class="btn btn-lg" value="Save">

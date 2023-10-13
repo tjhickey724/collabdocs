@@ -1,20 +1,38 @@
+<%if(oldparent=="." || oldparent==""){ %>
+ <a href="/">
+        <span class="button"> <%=folder%></span>
+      </a>
+<% } else  { %>
+<a href="/folders/<%= oldparent %>">
+        <span class="button"> <%=folder%></span>
+      </a>
+ <% } %>
 <h1>Collab Drive</h1>
 <form method="post" action="/newItem">
     <input type="text" name="name">
-    <input type="hidden" name="fpath" value="<%= user.googlename %>">
+    <input type="hidden" name="fpath" value="<%= fpath %>">
     <input type="hidden" name="fowner" value="<%= user.googleemail %>">
     <input type="hidden" name="type" value="file">
+    <input type="hidden" name="parent" value="<%= parent%>">
+
     <input type="submit" value="add new file"><br>
 </form>
 
 <form method="post" action="/newItem">
     <input type="text" name="name">
-    <input type="hidden" name="fpath" value="<%= user.googlename %>">
+    <input type="hidden" name="fpath" value="<%= fpath %>">
     <input type="hidden" name="fowner" value="<%= user.googleemail %>">
+    <input type="hidden" name="parent" value="<%= parent%>">
+
     <input type="hidden" name="type" value="folder">
     <input type="submit" value="add new folder"><br>
 </form>
 <hr>
+<a href="/shared">
+        <span class="button"> Shared with you</span>
+      </a>
+
+<h3><%= fpath %></h3>
 <table class="table table-bordered table-striped" style="background:white">
     <thead>
         <tr><th>Name</th><th>Shared</th><th>CreatedAt</th></tr>
@@ -35,7 +53,7 @@
     <% folders.forEach(f=> { %>
         <tr> 
           <td>
-              <a href=""> 
+              <a href="/folders/<%= f['_id'] %>"> 
                   <img src="/images/folder.png" width="24" height="24" />
                   <span><%= f.name %></span>
               </a>
