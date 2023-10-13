@@ -38,7 +38,7 @@ server.on('listening', onListening);
 const io = require('socket.io')(server);
 
 const io2 = io.of('/demo2')
-let oplist = {default:[]};
+let oplist = {default:[]};  // replace this with a database table ...
 let msetId=0;
 io2.on('connection', function(socket){
 
