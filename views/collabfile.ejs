@@ -1,0 +1,46 @@
+<h2>COLLABDOCS</h2>
+<%if(parent!="."){ %>
+
+    <a href="/folders/<%= parent %>">
+                   <span class="button"> <%=folder%></span>
+     </a>
+    <% } else  { %>
+   <a href="/">
+           <span class="button"> <%=folder%></span>
+         </a>
+    <% } %>
+    <center> <h2><%= file.path %> /<%= file.name %> file</h2></center>
+    <form method="post" action="/share">
+       <input type="hidden" name="id" value="<%= file['_id'] %>">
+       <input type="text" name="email">
+       <label for="privilege">Choose a privilege:</label>
+       <select id="privilege" name="privilege">
+     <option value="viewer">Viewer</option>
+     <option value="editor">Editor</option>
+     
+   </select>
+   
+       <input type="submit" value="share"><br>
+   </form>
+
+    <form method="post" action="/savefile">
+       <input type="hidden" name="id" value="<%= file['_id'] %>">
+       <input type="submit" class="btn btn-lg" value="Save">
+       <textarea id="content" name="text"
+           style="width:100%; height:20vh;"><%= file.text %></textarea>
+    </form>
+    <hr>
+    <h2>Collab Version</h2>
+    <div id="keycatch">
+        <canvas id="mset" tabindex="1"
+                height="50"
+                style="border:1px solid; font:32pt bold Courier">
+      </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="/collabed/fontmetrics.js"></script>
+    <script type="module" src="/loadEditor/<%= file['_id']%>"></script>
+   
+   
+   
+   

@@ -8,6 +8,7 @@ const layouts = require("express-ejs-layouts");
 //const auth = require('./config/auth.js');
 
 
+
 const mongoose = require( 'mongoose' );
 //mongoose.connect( `mongodb+srv://${auth.atlasAuth.username}:${auth.atlasAuth.password}@cluster0-yjamu.mongodb.net/authdemo?retryWrites=true&w=majority`);
 mongoose.connect( 'mongodb://127.0.0.1/authDemo');
@@ -51,8 +52,6 @@ app.use(loggingRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-//app.use('/todo',toDoRouter);
-//app.use('/todoAjax',toDoAjaxRouter);
 
 
 app.get("/file/:id", isLoggedIn, async(req, res, next) =>{
@@ -69,78 +68,36 @@ app.get("/file/:id", isLoggedIn, async(req, res, next) =>{
      res.render('filecontent2');//, { title: 'Express', path:file.path,filename:file.name,id:file._id, user: req.user,file:file,text:file.text});
   
 });
-// app.get('/profiles',
-//     isLoggedIn,
-//     async (req,res,next) => {
-//       try {
-//         res.locals.profiles = await User.find({})
-//         res.render('profiles')
-//       }
-//       catch(e){
-//         next(e)
-//       }
-//     }
-//   )
 
-// app.use('/publicprofile/:userId',
-//     async (req,res,next) => {
-//       try {
-//         let userId = req.params.userId
-//         res.locals.profile = await User.findOne({_id:userId})
-//         res.render('publicprofile')
-//       }
-//       catch(e){
-//         console.log("Error in /profile/userId:")
-//         next(e)
-//       }
-//     }
-// )
+app.get("/collabfile/:id", isLoggedIn, async(req, res, next) =>{
+  // this is like the /editor/:id from the collabed app
+  // we should have this just generate the editor.ejs from collabed ...
+     var id=req.params.id
+     console.log("COLLABFILE ---- IDDD is" + id)
+     const file=await File.findById(id);
+     console.log("file content")
+     console.log(file)
+     var folder=file.path.split('/')[(file.path.split('/').length-1)];
+     res.locals.file = file;
+     res.locals.parent=file.parent;
+     res.locals.folder=folder;
+     res.render('collabfile');//, { title: 'Express', path:file.path,filename:file.name,id:file._id, user: req.user,file:file,text:file.text});
+  
+});
 
 
-// app.get('/profile',
-//     isLoggedIn,
-//     (req,res) => {
-//       res.render('profile')
-//     })
+app.get('/loadEditor/:room', (req,res,next) => {
+  const room = req.params.room
+  res.type('.js')
+  console.log('in /loadEditor')
+  console.dir(req.params)
+  res.render('loadEditor',{ layout: 'no-layout', namespace:'/demo2', documentId:room })
+})
 
-// app.get('/editProfile',
-//     isLoggedIn,
-//     (req,res) => res.render('editProfile'))
-
-
-// app.post('/editProfile',
-//     isLoggedIn,
-//     async (req,res,next) => {
-//       try {
-//         let username = req.body.username
-//         let age = req.body.age
-//         req.user.username = username
-//         req.user.age = age
-//         req.user.imageURL = req.body.imageURL
-//         await req.user.save()
-//         res.redirect('/profile')
-//       } catch (error) {
-//         next(error)
-//       }
-
-//     })
-
-
-// app.use('/data',(req,res) => {
-//   res.json([{a:1,b:2},{a:5,b:3}]);
-// })
 
 const User = require('./models/User');
 
-// app.get("/test",async (req,res,next) => {
-//   try{
-//     const u = await User.find({})
-//     console.log("found u "+u)
-//   }catch(e){
-//     next(e)
-//   }
 
-// })
 
 app.post("/share", isLoggedIn,
   async (req, res, next) => {
