@@ -111,7 +111,7 @@ app.post("/share", isLoggedIn,
    });
 
 app.get('/shared', isLoggedIn, async(req, res, next) =>{
-  const sharedfiles= await  Privilege.find( {sharedwith:req.user.googleemail})
+  const sharedfiles= await  Privilege.find( {sharedwith:req.user.googleemail}).populate('fileId');
   res.render('shared',{files:sharedfiles} );
 });
 app.post("/newItem", isLoggedIn,

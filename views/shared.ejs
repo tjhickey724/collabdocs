@@ -9,9 +9,9 @@
     <% files.forEach(f=> { %>
       <tr> 
         <td>
-            <a href="/collabfile/<%= f.fileId %>"> 
+            <a href="/collabfile/<%= f.fileId['_id'] %>"> 
                 <img src="/images/file.png" width="24" height="24" />
-                <span><%= f.name %></span>
+                <span><%= f.fileId.name %></span>
             </a>
         </td>
         <td><%= f.privilegetype %></td>
