@@ -34,13 +34,30 @@ server.on('listening', onListening);
 /**
  * Creating the socket server ....
  */
+const mongoose = require( 'mongoose' );
+//mongoose.connect( `mongodb+srv://${auth.atlasAuth.username}:${auth.atlasAuth.password}@cluster0-yjamu.mongodb.net/authdemo?retryWrites=true&w=majority`);
+//mongoose.connect( 'mongodb://127.0.0.1/authDemo');
+//const mongoDB_URI = process.env.MONGODB_URI
+//mongoose.connect(mongoDB_URI)
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error in www:'));
+db.once('open', function() {
+  console.log("we are connected from www!!!")
+});
+const Operation =require('../models/Operation')
 
 const io = require('socket.io')(server);
 
 const io2 = io.of('/demo2')
 let oplist = {default:[]};  // replace this with a database table ...
 let msetId=0;
-io2.on('connection', function(socket){
+
+
+
+
+// old code
+/*io2.on('connection', function(socket){
 
   console.log('a user connected');
 
@@ -54,6 +71,82 @@ io2.on('connection', function(socket){
   socket.on('reset',function(msg){
     let z=(oplist[msg.fileId] || [])
     socket.emit('reset',{oplist:z});
+  })
+
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+
+  console.log("sending id");
+  socket.emit('msetId',{msetId:msetId++});
+  console.log(msetId)
+
+  });*/
+  //console.dir(oplist)
+
+// new code with db
+io2.on('connection', function(socket){
+let z=[]
+  console.log('a user connected');
+
+  socket.on('operation',function(msg){
+    console.log("in operation. msg=");
+    console.dir(msg);
+
+    const operation = new Operation(
+        {fileId:msg.documentId,
+         msg:JSON.stringify(msg)
+        });
+    console.log('creating an operation:')
+    //console.dir(operation);
+    operation.save();
+    console.log('emitting the msg');
+    io2.emit('remoteOperation',msg);
+  })
+    // Operation.find({fileId:msg.documentId}, function(err, operations) {
+    //    for (var oper in operations){
+    //       eval('var obj='+operations[oper].msg);
+    //       console.log("find")
+    //       console.log(obj)
+    //       console.log(obj.documentId)
+    //       z.push(obj)}
+    //     // If errors exist console log them on terminal server-side
+    //   if(err) {
+    //       console.log("Error:", err);
+    //   }});
+    // console.log("zoro12")
+    // console.log(z)
+
+    // oplist[msg.documentId]=z
+    // io2.emit('remoteOperation',msg);
+  //})
+
+  socket.on('reset',function(msg){
+    console.log('in reset')
+    console.dir(msg)
+    
+    Operation.find({fileId:msg.documentId}, function(err, operations) {
+      
+      if(err) {
+        console.log("Error:", err);
+        return;
+      }
+
+      let z=[]
+      for (let oper of operations){
+          //console.dir(oper);
+          var obj = JSON.parse(oper.msg);
+          //eval('var obj='+operations[oper].msg);
+          z.push(obj)}
+        // If errors exist console log them on terminal server-side
+      
+      
+      console.log('emitting oplist');
+      console.dir(z);
+  
+      socket.emit('reset',{oplist:z});
+    });
+
   })
 
   socket.on('disconnect', function(){

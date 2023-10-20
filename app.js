@@ -11,14 +11,14 @@ const layouts = require("express-ejs-layouts");
 
 const mongoose = require( 'mongoose' );
 //mongoose.connect( `mongodb+srv://${auth.atlasAuth.username}:${auth.atlasAuth.password}@cluster0-yjamu.mongodb.net/authdemo?retryWrites=true&w=majority`);
-mongoose.connect( 'mongodb://127.0.0.1/authDemo');
+mongoose.connect( 'mongodb://127.0.0.1/collabDocs');
 //const mongoDB_URI = process.env.MONGODB_URI
 //mongoose.connect(mongoDB_URI)
 
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+db.on('error', console.error.bind(console, 'connection error in app.js:'));
 db.once('open', function() {
-  console.log("we are connected!!!")
+  console.log("we are connected from app.js !!!")
 });
 
 const authRouter = require('./routes/authentication');
@@ -31,7 +31,7 @@ const toDoAjaxRouter = require('./routes/todoAjax');
 
 const Folder =require('./models/Folder')
 const File=require('./models/File')
-const Privilage=require('./models/Privilege')
+const Privilege=require('./models/Privilege')
 const app = express();
 
 // view engine setup
@@ -105,13 +105,13 @@ app.post("/share", isLoggedIn,
    if (req.body.email.trim().length>0 && file.owner==req.user.googleemail)
     file.shared="Yes"
     await file.save();
-    const privilage= new Privilage ({fileId:req.body.id, sharedwith:req.body.email, privilegetype:req.body.privilege})
-    await privilage.save();
-     res.redirect("/file/"+req.body.id);
+    const privilege= new Privilege ({fileId:req.body.id, sharedwith:req.body.email, privilegetype:req.body.privilege})
+    await privilege.save();
+     res.redirect("/collabfile/"+req.body.id);
    });
 
 app.get('/shared', isLoggedIn, async(req, res, next) =>{
-  const sharedfiles= await  Privilage.find( {sharedwith:req.user.googleemail})
+  const sharedfiles= await  Privilege.find( {sharedwith:req.user.googleemail})
   res.render('shared',{files:sharedfiles} );
 });
 app.post("/newItem", isLoggedIn,
@@ -142,7 +142,7 @@ app.post("/newItem", isLoggedIn,
          path: req.body.fpath,
          parent:req.body.parent,
          shared:"No",
-         privilage:"edit"
+         privilege:"edit"
         });
       await file.save();
     }

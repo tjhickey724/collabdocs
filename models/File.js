@@ -9,7 +9,7 @@ var FileSchema = Schema( {
   path: String,
   owner:String,
   shared:String,
-  privilage:String,
+  privilege:String,
   createdAt:Date,
   text: String,
   parent:String,
