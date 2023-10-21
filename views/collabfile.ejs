@@ -23,17 +23,11 @@
        <input type="submit" value="share"><br>
    </form>
 
-    <form method="post" action="/savefile">
-       <input type="hidden" name="id" value="<%= file['_id'] %>">
-       <input type="submit" class="btn btn-lg" value="Save">
-       <textarea id="content" name="text"
-           style="width:100%; height:20vh;"><%= file.text %></textarea>
-    </form>
     <hr>
     <h2>Collab Version</h2>
     <div id="keycatch">
         <canvas id="mset" tabindex="1"
-                height="50"
+                height="100vh"
                 style="border:1px solid; font:32pt bold Courier">
       </div>
     
