@@ -3,10 +3,11 @@ var router = express.Router();
 
 const Folder =require('../models/Folder')
 const File =require('../models/File')
-const authRouter = require('../routes/authentication');
+const authRouter = require('../routes/pwauth');
 const isLoggedIn = authRouter.isLoggedIn
 router.get('/', isLoggedIn, async(req, res, next) =>{
-	
+	console.log('user');
+  console.dir(req.user);
 	const folders=  await Folder.find({fowner:req.user.googleemail,parent:"."});
 	const files=await File.find({owner:req.user.googleemail,parent:"."});
     console.log(folders)

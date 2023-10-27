@@ -9,9 +9,11 @@ const layouts = require("express-ejs-layouts");
 
 
 
+
 const mongoose = require( 'mongoose' );
+const mongodb_URI = 'mongodb://127.0.0.1:27017/collabDocs';
 //mongoose.connect( `mongodb+srv://${auth.atlasAuth.username}:${auth.atlasAuth.password}@cluster0-yjamu.mongodb.net/authdemo?retryWrites=true&w=majority`);
-mongoose.connect( 'mongodb://127.0.0.1/collabDocs');
+mongoose.connect(mongodb_URI);// 'mongodb://127.0.0.1/collabDocs');
 //const mongoDB_URI = process.env.MONGODB_URI
 //mongoose.connect(mongoDB_URI)
 
@@ -21,7 +23,25 @@ db.once('open', function() {
   console.log("we are connected from app.js !!!")
 });
 
+//const session = require("express-session"); // to handle sessions using cookies
+const session = require("express-session"); // to handle sessions using cookies
+
+const User = require('./models/User')
+var MongoDBStore = require('connect-mongodb-session')(session);
+
+const store = new MongoDBStore({
+  uri: mongodb_URI,
+  collection: 'mySessions'
+});
+
+// Catch errors
+store.on('error', function(error) {
+  console.log(error);
+});
+
+
 const authRouter = require('./routes/authentication');
+const pwauth = require('./routes/pwauth');
 const isLoggedIn = authRouter.isLoggedIn
 const loggingRouter = require('./routes/logging');
 const indexRouter = require('./routes/index');
@@ -33,6 +53,23 @@ const Folder =require('./models/Folder')
 const File=require('./models/File')
 const Privilege=require('./models/Privilege')
 const app = express();
+
+
+
+app.use(require('express-session')({
+  secret: 'This is a secret',
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
+  },
+  store: store,
+  // Boilerplate options, see:
+  // * https://www.npmjs.com/package/express-session#resave
+  // * https://www.npmjs.com/package/express-session#saveuninitialized
+  resave: true,
+  saveUninitialized: true
+}));
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -47,7 +84,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(authRouter)
+//app.use(authRouter)
+app.use(pwauth);
 app.use(loggingRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -95,7 +133,7 @@ app.get('/loadEditor/:room', (req,res,next) => {
 })
 
 
-const User = require('./models/User');
+//const User = require('./models/User');
 
 
 
