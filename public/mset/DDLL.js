@@ -46,7 +46,7 @@ class DDLL {
     this.callback = callback
 
     //this is needed for garbage collection
-    this.gcType = 'serialized'  // none, p2p, or serialized
+    this.gcType = 'none'  // none, p2p, or serialized
     this.numElements = this.initElements.length
     this.gcThreshold = this.numElements*10000000 // /(Math.log(this.numElements)/Math.log(2))
     this.gcThresholdMin = 10000*10000000

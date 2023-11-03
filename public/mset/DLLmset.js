@@ -462,8 +462,9 @@ class DLLmset{
       //console.dir(n)
       //console.dir(c)
       if (n.elts.length != q){
-        console.log(JSON.stringify([nodeid,q,c,n.elts.length]))
-        //console.dir([n,this])
+        // console.log("inside treeextend: "+JSON.stringify([nodeid,c]))
+        // console.log(JSON.stringify([nodeid,q,c,n.elts.length]))
+        // console.dir([n,this])
         throw new Error("error in treeextend, not inserting at end of list")
       }
       n.elts = n.elts.concat(c)
